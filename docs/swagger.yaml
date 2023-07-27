@@ -1,0 +1,24 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: This is an auto-generated swagger for the Gorest project
+  title: Gorest API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Get the current server status.
+      responses:
+        "200":
+          description: Server status
+          schema:
+            type: string
+        "500":
+          description: Server error
+          schema:
+            type: string
+      summary: Show the status of server.
+      tags:
+      - root
+swagger: "2.0"
