@@ -1,0 +1,2 @@
+root: "github.com/JhonatanRSantos/gorest/"
+exclusions: [cmd/main.go, docs]
