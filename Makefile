@@ -30,3 +30,6 @@ coverage_tests:
 	go test ./... -covermode=atomic -coverprofile=/tmp/coverage.out -coverpkg=./... -count=1	
 	@#goverreport -coverprofile=/tmp/coverage.out -sort=block -order=desc -threshold=90 || (echo -e "**********Minimum test coverage was not reached(90%)**********"; exit 1)
 	go tool cover -html=/tmp/coverage.out
+
+run:
+	go run cmd/main.go

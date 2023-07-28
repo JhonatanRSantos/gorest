@@ -1,9 +1,9 @@
 package webserver
 
 import (
-	"context"
 	"fmt"
 	"html/template"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -80,12 +80,12 @@ func DefaultConfig(config WebServerDefaultConfig) *WebServerConfig {
 		CompressedFileSuffix:  fmt.Sprintf(".%s.gz", config.AppName),
 		DisableStartupMessage: true,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			if _, ok := gocontext.Get[string](c.UserContext(), "recover"); ok {
+			if _, ok := gocontext.Get[string](c.UserContext(), "panic-error"); ok {
 				golog.Log().Error(c.Context(), fmt.Sprintf("Recovered from panic. Cause: %s", err))
 			} else {
 				golog.Log().Error(c.Context(), fmt.Sprintf("Unexpected error. Cause: %s", err))
 			}
-			return nil
+			return c.SendStatus(http.StatusInternalServerError)
 		},
 		ReadTimeout:  time.Second * 5, // max time for reading the request
 		WriteTimeout: time.Second * 5, // max time for write the response
@@ -100,13 +100,17 @@ func DefaultConfig(config WebServerDefaultConfig) *WebServerConfig {
 		MaxAge:           config.Cors.MaxAge,
 	}))
 	app.Use(recover.New(recover.Config{
-		Next: func(c *fiber.Ctx) bool {
-			c.SetUserContext(
-				gocontext.Add(
-					gocontext.FromContext(context.Background()), "recover", "panic",
-				),
-			)
-			return false
+		EnableStackTrace: true,
+		StackTraceHandler: func(c *fiber.Ctx, e interface{}) {
+			ctx := gocontext.FromContext(c.UserContext())
+
+			if err, ok := e.(error); ok {
+				gocontext.Add[string](ctx, "panic-error", err.Error())
+			} else {
+				gocontext.Add[string](ctx, "panic-error", fmt.Sprint(e))
+			}
+
+			c.SetUserContext(ctx)
 		},
 	}))
 
