@@ -80,6 +80,10 @@ func DefaultConfig(config WebServerDefaultConfig) *WebServerConfig {
 		CompressedFileSuffix:  fmt.Sprintf(".%s.gz", config.AppName),
 		DisableStartupMessage: true,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			if strings.Contains(c.String(), "<->") {
+				return nil
+			}
+
 			if _, ok := gocontext.Get[string](c.UserContext(), "panic-error"); ok {
 				golog.Log().Error(c.Context(), fmt.Sprintf("Recovered from panic. Cause: %s", err))
 			} else {
@@ -177,7 +181,7 @@ func (ws *WebServer) gracefulShutdown() {
 		<-shutdownChannel
 		err := app.Shutdown()
 		if err != nil {
-			panic(fmt.Errorf("failed to gracefully shotdown. Cause: %v", err))
+			panic(err)
 		}
 	}(shutdownChannel, ws.app)
 }

@@ -17,7 +17,7 @@ install_deps:
 	go install github.com/swaggo/swag/cmd/swag@latest
 
 swagger:
-	swag init -d cmd/
+	swag init  --parseInternal --parseDependency --parseDepth 3 --exclude /usr -d cmd/
 
 lint:
 	@echo "Running linters"

@@ -1,4 +1,56 @@
 basePath: /
+definitions:
+  model.CreateUserRequestV1:
+    properties:
+      country:
+        type: string
+      default_language:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phones:
+        items:
+          type: string
+        type: array
+    type: object
+  model.CreateUserResponseV1:
+    properties:
+      country:
+        type: string
+      default_language:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phones:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: string
+    type: object
+  model.GetUserResponseV1:
+    properties:
+      country:
+        type: string
+      default_language:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phones:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -21,4 +73,71 @@ paths:
       summary: Show the status of server.
       tags:
       - root
+  /v1/users:
+    delete:
+      parameters:
+      - description: User email
+        in: query
+        name: email
+        type: string
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Error description
+          schema:
+            type: string
+      summary: Deactivate user
+      tags:
+      - users
+    get:
+      parameters:
+      - description: User email
+        in: query
+        name: email
+        type: string
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User information
+          schema:
+            $ref: '#/definitions/model.GetUserResponseV1'
+        "500":
+          description: Error description
+          schema:
+            type: string
+      summary: Get user information
+      tags:
+      - users
+    post:
+      parameters:
+      - description: User information
+        in: body
+        name: user_info
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateUserRequestV1'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User information
+          schema:
+            $ref: '#/definitions/model.CreateUserResponseV1'
+        "500":
+          description: Error description
+          schema:
+            type: string
+      summary: Create a new user
+      tags:
+      - users
 swagger: "2.0"
